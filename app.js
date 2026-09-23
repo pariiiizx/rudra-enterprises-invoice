@@ -1,6 +1,6 @@
 /**
  * Rudra Enterprises Invoice Generator — Core Application Logic
- * 100% Client-Side Generation with Authentic Excel Page Margins
+ * Native Excel Automation with In-Browser Fallback
  */
 
 /* ===== Buyer Configuration ===== */
@@ -143,7 +143,7 @@ function handleFormSubmit(e) {
   const taxableValue = amount;
   const igst = taxableValue * 0.18;
   const total = taxableValue + igst;
-  const words = numberToWordsIndian(total); // already contains '... Only'
+  const words = numberToWordsIndian(total); // contains '... Only'
   const amountInWords = words;
 
   // Store computed data
@@ -174,120 +174,101 @@ function handleFormSubmit(e) {
   showScreen('preview');
 }
 
-/* ===== 100% Client-Side Invoice Generation with Proper Page Margins ===== */
+/* ===== Authentic Invoice Generation (Excel Backend with Client-Side Fallback) ===== */
 async function generateInvoiceDirect() {
-  showLoading(true, 'Rendering high-resolution invoice...');
+  showLoading(true, 'Updating Excel workbook & Exporting PDF...');
 
   try {
     const data = window._invoiceData;
-    const renderContainer = document.getElementById('invoice-render-container');
-    if (!renderContainer) throw new Error('Render container missing');
 
-    // 1. Generate HTML template
-    const invoiceHTML = selectedBuyer.id === 'kaka' 
-      ? generateKakaInvoiceHTML(data) 
-      : generateMyTilesInvoiceHTML(data);
-
-    renderContainer.innerHTML = invoiceHTML;
-
-    // Small delay to ensure DOM and fonts settle
-    await new Promise(r => setTimeout(r, 60));
-
-    const invoiceElem = document.getElementById('invoice-doc') || renderContainer.firstElementChild;
-
-    // 2. Render to high-DPI canvas via html2canvas
-    const canvas = await html2canvas(invoiceElem, {
-      scale: 2.5, // Crisp print resolution
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff'
-    });
-
-    const previewDataUrl = canvas.toDataURL('image/png');
-
-    // 3. Generate A4 PDF via jsPDF with authentic page margins
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4',
-      compress: true
-    });
-
-    // A4 sheet: 210mm wide x 297mm high
-    // Authentic Excel margins: 16mm left/right, 18mm top
-    const marginX = 16; // mm
-    const marginY = 18; // mm
-    const printWidth = 210 - (marginX * 2); // 178mm printable width
-    const printHeight = (canvas.height * printWidth) / canvas.width;
-
-    pdf.addImage(previewDataUrl, 'PNG', marginX, marginY, printWidth, printHeight);
-
-    currentPDFBlob = pdf.output('blob');
-    if (currentPDFUrl) URL.revokeObjectURL(currentPDFUrl);
-    currentPDFUrl = URL.createObjectURL(currentPDFBlob);
-
-    // 4. Generate modified Excel (.xlsx) file in browser via SheetJS
+    // Try native Excel server first
+    let generatedViaServer = false;
     try {
-      const templateFilename = selectedBuyer.id === 'kaka' ? 'kaka tiles.xlsx' : 'My tiles.xlsx';
-      const xlsxResponse = await fetch(templateFilename);
-      if (xlsxResponse.ok) {
-        const arrayBuf = await xlsxResponse.arrayBuffer();
-        const wb = XLSX.read(arrayBuf, { type: 'array' });
-        const wordsFormatted = `Amount charged in words : ${data.amountInWords}`;
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          buyer: data.buyer,
+          invoiceNumber: data.invoiceNo,
+          invoiceDate: data.invoiceDate,
+          quantity: data.quantity
+        })
+      });
 
-        if (selectedBuyer.id === 'kaka') {
-          const ws = wb.Sheets['Table 1'];
-          if (ws) {
-            ws['D5'] = { t: 's', v: String(data.invoiceNo) };
-            ws['D7'] = { t: 's', v: String(data.invoiceDate) };
-            ws['B18'] = { t: 's', v: 'Cermaic Tile' };
-            ws['D18'] = { t: 'n', v: data.quantity };
-            ws['G18'] = { t: 'n', v: data.amount };
-            ws['G19'] = { t: 'n', v: data.taxableValue };
-            ws['G22'] = { t: 'n', v: data.igst };
-            ws['G23'] = { t: 'n', v: data.total };
-            ws['A24'] = { t: 's', v: wordsFormatted };
-          }
-        } else {
-          const ws = wb.Sheets['My tile'];
-          if (ws) {
-            const rawD3 = ws['D3'] ? String(ws['D3'].v || '') : '';
-            const lines = rawD3.split('\n');
-            if (lines.length >= 2) {
-              lines[0] = String(data.invoiceNo);
-              lines[1] = String(data.invoiceDate);
-              ws['D3'] = { t: 's', v: lines.join('\n') };
-            } else {
-              ws['D3'] = { t: 's', v: `${data.invoiceNo}\n${data.invoiceDate}` };
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          // Convert base64 PDF into Blob for sharing
+          try {
+            const byteCharacters = atob(result.pdfBase64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+              byteNumbers[i] = byteCharacters.charCodeAt(i);
             }
-            ws['B10'] = { t: 's', v: 'Cermaic Tile' };
-            ws['D10'] = { t: 'n', v: data.quantity };
-            ws['G10'] = { t: 'n', v: data.amount };
-            ws['G11'] = { t: 'n', v: data.taxableValue };
-            ws['G14'] = { t: 'n', v: data.igst };
-            ws['G15'] = { t: 'n', v: data.total };
-            ws['A16'] = { t: 's', v: wordsFormatted };
+            const byteArray = new Uint8Array(byteNumbers);
+            currentPDFBlob = new Blob([byteArray], { type: 'application/pdf' });
+          } catch (b64Err) {
+            console.warn('Base64 decode warning:', b64Err);
+            currentPDFBlob = null;
           }
-        }
 
-        const outArray = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-        currentXLSXBlob = new Blob([outArray], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        if (currentXLSXUrl) URL.revokeObjectURL(currentXLSXUrl);
-        currentXLSXUrl = URL.createObjectURL(currentXLSXBlob);
+          currentPDFUrl = result.pdfUrl;
+          currentXLSXUrl = result.xlsxUrl;
+
+          elements.resultFilename.textContent = result.fileName;
+          elements.resultPreviewImg.src = `${result.previewUrl}?t=${Date.now()}`;
+          generatedViaServer = true;
+        }
       }
-    } catch (xlsxErr) {
-      console.warn('SheetJS in-browser Excel generation note:', xlsxErr);
+    } catch (serverErr) {
+      console.log('Native Excel server not reachable, using in-browser engine:', serverErr);
     }
 
-    // 5. Save last invoice number to localStorage
+    // Fallback: In-browser generation if server is offline
+    if (!generatedViaServer) {
+      const renderContainer = document.getElementById('invoice-render-container');
+      const invoiceHTML = selectedBuyer.id === 'kaka' 
+        ? generateKakaInvoiceHTML(data) 
+        : generateMyTilesInvoiceHTML(data);
+
+      renderContainer.innerHTML = invoiceHTML;
+      await new Promise(r => setTimeout(r, 60));
+
+      const invoiceElem = document.getElementById('invoice-doc') || renderContainer.firstElementChild;
+      const canvas = await html2canvas(invoiceElem, {
+        scale: 2.5,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff'
+      });
+
+      const previewDataUrl = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+
+      const marginX = 16;
+      const marginY = 18;
+      const printWidth = 210 - (marginX * 2);
+      const printHeight = (canvas.height * printWidth) / canvas.width;
+      pdf.addImage(previewDataUrl, 'PNG', marginX, marginY, printWidth, printHeight);
+
+      currentPDFBlob = pdf.output('blob');
+      if (currentPDFUrl) URL.revokeObjectURL(currentPDFUrl);
+      currentPDFUrl = URL.createObjectURL(currentPDFBlob);
+
+      elements.resultFilename.textContent = `${currentInvoiceNo}.pdf`;
+      elements.resultPreviewImg.src = previewDataUrl;
+    }
+
+    // Save last invoice number to localStorage
     localStorage.setItem(selectedBuyer.storageKey, currentInvoiceNo);
 
-    // 6. Update Result Screen
-    elements.resultFilename.textContent = `${currentInvoiceNo}.pdf`;
-    elements.resultPreviewImg.src = previewDataUrl;
-
-    // 7. Check Web Share API capability
+    // Check Web Share API capability
     elements.btnShare.style.display = 'none';
     try {
       if (navigator.share) {
@@ -329,7 +310,6 @@ async function sharePDF() {
           return;
         }
       }
-      // Fallback share URL
       await navigator.share({
         title: `Tax Invoice ${currentInvoiceNo}`,
         text: `Tax Invoice ${currentInvoiceNo} from Rudra Enterprises`,
@@ -348,11 +328,9 @@ async function sharePDF() {
 
 function downloadPDF() {
   const filename = `${currentInvoiceNo}.pdf`;
-  if (!currentPDFUrl && currentPDFBlob) {
-    currentPDFUrl = URL.createObjectURL(currentPDFBlob);
-  }
+  const url = currentPDFUrl || `/generated/${filename}`;
   const a = document.createElement('a');
-  a.href = currentPDFUrl;
+  a.href = url;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
@@ -363,15 +341,9 @@ function downloadPDF() {
 
 function downloadXLSX() {
   const filename = `${currentInvoiceNo}.xlsx`;
-  if (!currentXLSXUrl && currentXLSXBlob) {
-    currentXLSXUrl = URL.createObjectURL(currentXLSXBlob);
-  }
-  if (!currentXLSXUrl) {
-    alert('Excel template could not be loaded.');
-    return;
-  }
+  const url = currentXLSXUrl || `/generated/${filename}`;
   const a = document.createElement('a');
-  a.href = currentXLSXUrl;
+  a.href = url;
   a.download = filename;
   document.body.appendChild(a);
   a.click();
@@ -417,7 +389,6 @@ function shakeElement(el) {
   setTimeout(() => { el.style.animation = ''; }, 400);
 }
 
-// Keyframes for validation feedback
 const shakeStyle = document.createElement('style');
 shakeStyle.textContent = `
   @keyframes shake {
