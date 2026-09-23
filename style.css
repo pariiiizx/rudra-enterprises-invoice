@@ -606,6 +606,36 @@ body::after {
   transform: translateY(1px) scale(0.98);
 }
 
+.btn-whatsapp {
+  width: 100%;
+  padding: 15px 24px;
+  background: #25D366;
+  border: none;
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: 0 2px 12px rgba(37, 211, 102, 0.25);
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-whatsapp:hover {
+  background: #20bd5a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(37, 211, 102, 0.35);
+}
+
+.btn-whatsapp:active {
+  transform: translateY(1px) scale(0.98);
+}
+
 .btn-secondary {
   width: 100%;
   padding: 14px 24px;

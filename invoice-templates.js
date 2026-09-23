@@ -54,7 +54,7 @@ function generateKakaInvoiceHTML(data) {
         <tbody>
           <!-- Row 1: TAX INVOICE Header -->
           <tr style="height: 28px; border-bottom: 1px solid #000;">
-            <td colspan="7" style="padding: 4px 10px; font-family: 'Times New Roman', serif; font-size: 10.5pt; font-weight: normal; vertical-align: middle;">
+            <td colspan="7" style="padding: 4px 10px; font-family: Arial, sans-serif; font-size: 10.5pt; font-weight: normal; vertical-align: middle;">
               TAX INVOICE
               <span style="float: right; font-weight: bold; font-size: 9.5pt;">1/ 2/ 3</span>
             </td>
@@ -201,7 +201,7 @@ function generateKakaInvoiceHTML(data) {
             <td style="font-size: 10.5pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000;">
               36AAWFK9520H1ZS
             </td>
-            <td style="font-family: 'Times New Roman', serif; font-size: 9.5pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+            <td style="font-size: 9.5pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000;">
               Inco Term
             </td>
             <td colspan="4" style="font-size: 8.5pt; padding: 2px 6px; border-bottom: 1px solid #000;">
@@ -277,17 +277,17 @@ function generateKakaInvoiceHTML(data) {
 
           <!-- Row 25 & 26: Bank Details & Declaration (Left), Signatory (Right) -->
           <tr>
-            <td colspan="3" style="font-family: 'Times New Roman', serif; font-size: 9.5pt; padding: 4px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000; height: 50px; vertical-align: top; line-height: 1.45;">
+            <td colspan="3" style="font-size: 9.5pt; padding: 4px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000; height: 50px; vertical-align: top; line-height: 1.45;">
               Bank Name  : HDFC<br>
               Bank Account No.  50200004017434 RTGS/IFS Code :HDFC0000331
             </td>
-            <td colspan="4" rowspan="2" style="font-family: 'Times New Roman', serif; font-size: 9.5pt; padding: 6px 12px; vertical-align: top; line-height: 1.4;">
+            <td colspan="4" rowspan="2" style="font-size: 9.5pt; padding: 6px 12px; vertical-align: top; line-height: 1.4;">
               For Rudra Enterprises<br><br><br>
               Authorised Signatory
             </td>
           </tr>
           <tr>
-            <td colspan="3" style="font-family: 'Times New Roman', serif; font-size: 9.5pt; padding: 4px 6px; border-right: 1px solid #000; height: 44px; vertical-align: top; line-height: 1.35;">
+            <td colspan="3" style="font-size: 9.5pt; padding: 4px 6px; border-right: 1px solid #000; height: 44px; vertical-align: top; line-height: 1.35;">
               Declaration<br>
               We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct
             </td>
@@ -295,11 +295,6 @@ function generateKakaInvoiceHTML(data) {
 
         </tbody>
       </table>
-
-      <!-- Row 27: Footer Outside Border -->
-      <div style="padding: 4px 0 2px 0; font-size: 8.5pt; font-weight: bold; text-align: center;">
-        This is a computer generated invoice
-      </div>
     </div>
   `;
 }
@@ -508,11 +503,6 @@ function generateMyTilesInvoiceHTML(data) {
 
         </tbody>
       </table>
-
-      <!-- Footer Outside Border -->
-      <div style="padding: 4px 0 2px 0; font-size: 8.5pt; font-weight: bold; text-align: center;">
-        This is a computer generated invoice
-      </div>
     </div>
   `;
 }

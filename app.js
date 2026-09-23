@@ -65,6 +65,7 @@ const elements = {
   resultFilename: document.getElementById('result-filename'),
   resultPreviewImg: document.getElementById('result-preview-img'),
   btnShare: document.getElementById('btn-share'),
+  btnWhatsApp: document.getElementById('btn-whatsapp'),
   btnDownload: document.getElementById('btn-download'),
   btnDownloadExcel: document.getElementById('btn-download-excel'),
 
@@ -268,22 +269,9 @@ async function generateInvoiceDirect() {
     // Save last invoice number to localStorage
     localStorage.setItem(selectedBuyer.storageKey, currentInvoiceNo);
 
-    // Check Web Share API capability
-    elements.btnShare.style.display = 'none';
-    try {
-      if (navigator.share) {
-        if (currentPDFBlob && navigator.canShare && typeof File !== 'undefined') {
-          const testFile = new File([currentPDFBlob], `${currentInvoiceNo}.pdf`, { type: 'application/pdf' });
-          if (navigator.canShare({ files: [testFile] })) {
-            elements.btnShare.style.display = 'flex';
-          }
-        } else {
-          elements.btnShare.style.display = 'flex';
-        }
-      }
-    } catch (shareCheckErr) {
-      console.warn('Share check:', shareCheckErr);
-    }
+    // Share buttons are always accessible
+    if (elements.btnShare) elements.btnShare.style.display = 'flex';
+    if (elements.btnWhatsApp) elements.btnWhatsApp.style.display = 'flex';
 
     showScreen('result');
   } catch (err) {
@@ -297,33 +285,84 @@ async function generateInvoiceDirect() {
 /* ===== Share & Download Actions ===== */
 async function sharePDF() {
   const filename = `${currentInvoiceNo}.pdf`;
-  try {
-    if (navigator.share) {
+  const data = window._invoiceData || {};
+  const buyerName = selectedBuyer ? selectedBuyer.name : 'Customer';
+  const totalStr = data.total ? `₹${data.total.toLocaleString('en-IN')}` : '';
+  const shareText = `Tax Invoice #${currentInvoiceNo} for ${buyerName} (Total: ${totalStr}) from Rudra Enterprises.`;
+
+  // Ensure currentPDFBlob is ready
+  if (!currentPDFBlob && currentPDFUrl) {
+    try {
+      const resp = await fetch(currentPDFUrl);
+      if (resp.ok) {
+        currentPDFBlob = await resp.blob();
+      }
+    } catch (e) {
+      console.warn('Could not fetch PDF blob:', e);
+    }
+  }
+
+  // Attempt native Web Share API (works on mobile HTTPS)
+  if (navigator.share) {
+    try {
       if (currentPDFBlob && typeof File !== 'undefined') {
         const file = new File([currentPDFBlob], filename, { type: 'application/pdf' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],
             title: `Tax Invoice ${currentInvoiceNo}`,
-            text: `Tax Invoice ${currentInvoiceNo} for ${selectedBuyer ? selectedBuyer.name : ''} from Rudra Enterprises`
+            text: shareText
           });
           return;
         }
       }
+
+      // If browser can't share files natively (e.g. desktop), share text + URL
+      const shareUrl = currentPDFUrl ? (currentPDFUrl.startsWith('http') ? currentPDFUrl : window.location.origin + currentPDFUrl) : window.location.href;
       await navigator.share({
         title: `Tax Invoice ${currentInvoiceNo}`,
-        text: `Tax Invoice ${currentInvoiceNo} from Rudra Enterprises`,
-        url: window.location.href
+        text: shareText,
+        url: shareUrl
       });
-    } else {
-      downloadPDF();
-    }
-  } catch (err) {
-    if (err.name !== 'AbortError') {
-      console.error('Share failed:', err);
-      downloadPDF();
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        return; // User cancelled share sheet
+      }
+      console.warn('Native share failed, falling back:', err);
     }
   }
+
+  // Fallback for HTTP / Desktop / Unsupported environments
+  downloadPDF();
+  const waConfirm = confirm(`Invoice ${filename} has been downloaded to your device!\n\nWould you like to open WhatsApp to share invoice details?`);
+  if (waConfirm) {
+    shareWhatsApp();
+  }
+}
+
+function shareWhatsApp() {
+  const data = window._invoiceData || {};
+  const buyerName = selectedBuyer ? selectedBuyer.name : 'Customer';
+  const totalStr = data.total ? `₹${data.total.toLocaleString('en-IN')}` : '';
+  const dateStr = data.invoiceDate || '';
+  const qtyStr = data.quantity ? `${data.quantity} Boxes` : '';
+  
+  // Ensure PDF is also downloaded
+  downloadPDF();
+
+  const msg = `*RUDRA ENTERPRISES — TAX INVOICE*\n` +
+    `─────────────────────────\n` +
+    `*Invoice No:* #${currentInvoiceNo}\n` +
+    `*Date:* ${dateStr}\n` +
+    `*Buyer:* ${buyerName}\n` +
+    `*Quantity:* ${qtyStr}\n` +
+    `*Total Amount:* ${totalStr}\n` +
+    `─────────────────────────\n` +
+    `_Tax invoice PDF has been downloaded to your device._`;
+
+  const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+  window.open(waUrl, '_blank');
 }
 
 function downloadPDF() {
