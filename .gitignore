@@ -2,20 +2,19 @@
 cloudflared.exe
 *.exe
 
-# Python caches
+# Python & scripts
 __pycache__/
 *.pyc
-server.py
+*.py
+test_*.js
 
 # Generated / temporary test files
 generated/
-test_*.pdf
-test_*.png
-test_*.xlsx
-kaka_native_page1.png
-kaka_tiles_native.pdf
-my_native_page1.png
-my_tiles_native.pdf
+*.pdf
+*.png
+*.xlsx
+!kaka tiles.xlsx
+!My tiles.xlsx
 
 # Vercel
 .vercel

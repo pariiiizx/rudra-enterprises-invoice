@@ -169,7 +169,8 @@
         <!-- Authentic PDF Page Preview -->
         <div class="invoice-preview-card">
           <div class="invoice-preview-wrapper">
-            <img id="result-preview-img" src="" alt="Authentic Invoice Preview" class="invoice-preview-img">
+            <img id="result-preview-img" src="" alt="Authentic Invoice Preview" class="invoice-preview-img" style="display:none;">
+            <canvas id="result-preview-canvas" class="invoice-preview-img"></canvas>
           </div>
         </div>
 
@@ -197,18 +198,15 @@
   <!-- Loading Overlay -->
   <div class="loading-overlay" id="loading-overlay">
     <div class="loading-spinner"></div>
-    <div class="loading-text" id="loading-text">Rendering invoice...</div>
+    <div class="loading-text" id="loading-text">Generating invoice...</div>
   </div>
 
-  <!-- Off-Screen Render Container for High-DPI Invoice Capture -->
-  <div id="invoice-render-container" style="position: fixed; left: -9999px; top: 0; width: 680px; background: #ffffff; z-index: -9999; pointer-events: none;"></div>
-
   <!-- App Scripts -->
-  <script src="vendor/html2canvas.min.js"></script>
-  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="vendor/pdf-lib.min.js"></script>
+  <script src="vendor/pdf.min.js"></script>
   <script src="vendor/xlsx.full.min.js"></script>
   <script src="number-to-words.js"></script>
-  <script src="invoice-templates.js"></script>
+  <script src="templates-data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
