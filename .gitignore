@@ -1,0 +1,22 @@
+# Cloudflare tunnel & local tools
+cloudflared.exe
+*.exe
+
+# Python caches
+__pycache__/
+*.pyc
+server.py
+
+# Generated / temporary test files
+generated/
+test_*.pdf
+test_*.png
+test_*.xlsx
+kaka_native_page1.png
+kaka_tiles_native.pdf
+my_native_page1.png
+my_tiles_native.pdf
+
+# Vercel
+.vercel
+node_modules/

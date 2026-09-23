@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Generate GST tax invoice PDFs directly from Excel templates for Rudra Enterprises. Quick, mobile-friendly invoice generator for Kaka Tile Studio and My Tile Studio.">
+  <meta name="theme-color" content="#f5f5f7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Rudra Enterprises — Invoice Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="app-logo">Rudra Enterprises</div>
+      <h1 class="app-title">Invoice Generator</h1>
+      <p class="app-subtitle">GST Tax Invoice Generator</p>
+    </header>
+
+    <!-- Screen 1: Buyer Selection -->
+    <section id="screen-select" class="screen active">
+      <div class="buyer-selection">
+        <div class="section-label">Select Buyer</div>
+
+        <div class="buyer-card" id="card-kaka" onclick="selectBuyer('kaka')" role="button" tabindex="0" aria-label="Select Kaka Tile Studio">
+          <div class="buyer-card-icon">🏪</div>
+          <div class="buyer-card-name">Kaka Tile Studio</div>
+          <div class="buyer-card-location">Hyderabad, Telengana</div>
+          <div class="buyer-card-arrow">→</div>
+        </div>
+
+        <div class="buyer-card" id="card-my" onclick="selectBuyer('my')" role="button" tabindex="0" aria-label="Select My Tile Studio">
+          <div class="buyer-card-icon">🏬</div>
+          <div class="buyer-card-name">My Tile Studio</div>
+          <div class="buyer-card-location">Hyderabad, Telengana</div>
+          <div class="buyer-card-arrow">→</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screen 2: Invoice Form -->
+    <section id="screen-form" class="screen">
+      <div class="form-screen">
+        <button class="back-button" onclick="goBackToSelect()" id="btn-back-select" aria-label="Go back to buyer selection">
+          ← Back
+        </button>
+
+        <div class="selected-buyer-badge">
+          <span class="badge-icon" id="buyer-badge-icon">🏪</span>
+          <span class="badge-text" id="buyer-badge-name">Kaka Tile Studio</span>
+        </div>
+
+        <form onsubmit="handleFormSubmit(event)" id="invoice-form">
+          <div class="form-group">
+            <label class="form-label" for="invoice-no">Invoice Number</label>
+            <input
+              type="text"
+              id="invoice-no"
+              class="form-input"
+              placeholder="e.g. 767"
+              inputmode="numeric"
+              required
+              autocomplete="off"
+            >
+            <div class="form-hint" id="invoice-no-hint">No previous invoice found</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="invoice-date">Invoice Date</label>
+            <input
+              type="text"
+              id="invoice-date"
+              class="form-input"
+              placeholder="dd/mm/yyyy"
+              pattern="\d{1,2}/\d{1,2}/\d{4}"
+              required
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="quantity">Quantity (Boxes)</label>
+            <input
+              type="number"
+              id="quantity"
+              class="form-input"
+              placeholder="Enter number of boxes"
+              inputmode="numeric"
+              min="1"
+              required
+            >
+          </div>
+
+          <button type="submit" class="btn-primary" id="btn-generate-preview">
+            Preview Invoice
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Screen 3: Preview & Confirm -->
+    <section id="screen-preview" class="screen">
+      <div class="preview-screen">
+        <button class="back-button" onclick="goBackToForm()" id="btn-back-form" aria-label="Go back to form">
+          ← Edit
+        </button>
+
+        <div class="preview-card">
+          <div class="preview-title">Invoice Summary</div>
+
+          <div class="preview-row">
+            <span class="preview-label">Buyer</span>
+            <span class="preview-value" id="preview-buyer">—</span>
+          </div>
+          <div class="preview-row">
+            <span class="preview-label">Invoice No.</span>
+            <span class="preview-value" id="preview-invoice-no">—</span>
+          </div>
+          <div class="preview-row">
+            <span class="preview-label">Date</span>
+            <span class="preview-value" id="preview-date">—</span>
+          </div>
+          <div class="preview-row">
+            <span class="preview-label">Quantity</span>
+            <span class="preview-value" id="preview-qty">—</span>
+          </div>
+
+          <div class="preview-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-subtle);">
+            <span class="preview-label">Amount (Qty × ₹1000)</span>
+            <span class="preview-value" id="preview-amount">—</span>
+          </div>
+          <div class="preview-row">
+            <span class="preview-label">Taxable Value</span>
+            <span class="preview-value" id="preview-taxable">—</span>
+          </div>
+          <div class="preview-row">
+            <span class="preview-label">IGST (18%)</span>
+            <span class="preview-value" id="preview-igst">—</span>
+          </div>
+          <div class="preview-row total">
+            <span class="preview-label">Total</span>
+            <span class="preview-value" id="preview-total">—</span>
+          </div>
+
+          <div class="preview-words" id="preview-words">—</div>
+        </div>
+
+        <div class="preview-buttons">
+          <button class="btn-primary" onclick="generateInvoiceDirect()" id="btn-confirm-generate">
+            Confirm & Generate Invoice
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Screen 4: Result (Share/Download) -->
+    <section id="screen-result" class="screen">
+      <div class="result-screen">
+        <div class="result-icon">✓</div>
+        <div class="result-title">Invoice Ready!</div>
+        <div class="result-subtitle">Generated directly from authentic Excel template.</div>
+
+        <div class="result-filename">
+          📄 <span class="filename" id="result-filename">invoice.pdf</span>
+        </div>
+
+        <!-- Authentic PDF Page Preview -->
+        <div class="invoice-preview-card">
+          <div class="invoice-preview-wrapper">
+            <img id="result-preview-img" src="" alt="Authentic Invoice Preview" class="invoice-preview-img">
+          </div>
+        </div>
+
+        <div class="result-actions">
+          <button class="btn-share" onclick="sharePDF()" id="btn-share" aria-label="Share PDF via WhatsApp, email, etc.">
+            📤 Share Invoice (PDF)
+          </button>
+          <button class="btn-secondary" onclick="downloadPDF()" id="btn-download" aria-label="Download PDF file">
+            ⬇ Download PDF
+          </button>
+          <button class="btn-secondary btn-excel" onclick="downloadXLSX()" id="btn-download-excel" aria-label="Download Excel spreadsheet">
+            📊 Download Excel (.xlsx)
+          </button>
+          <button class="btn-secondary btn-new-invoice" onclick="startNewInvoice()" id="btn-new-invoice" aria-label="Create a new invoice">
+            ＋ New Invoice
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loading-text">Rendering invoice...</div>
+  </div>
+
+  <!-- Off-Screen Render Container for High-DPI Invoice Capture -->
+  <div id="invoice-render-container" style="position: fixed; left: -9999px; top: 0; width: 780px; background: #ffffff; z-index: -9999; pointer-events: none;"></div>
+
+  <!-- App Scripts -->
+  <script src="vendor/html2canvas.min.js"></script>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="vendor/xlsx.full.min.js"></script>
+  <script src="number-to-words.js"></script>
+  <script src="invoice-templates.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

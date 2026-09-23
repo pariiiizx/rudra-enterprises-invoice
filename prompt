@@ -1,0 +1,103 @@
+# Build Prompt: Rudra Enterprises Invoice Generator
+
+Copy everything below into Antigravity as the project prompt. The two reference files `kaka_tiles.xlsx` and `My_tiles.xlsx` will be provided in the project folder — treat them as the literal, authoritative source of truth for layout, wording, spacing, and formatting. Do not redesign, restyle, or "clean up" anything about them.
+
+---
+
+## Prompt
+
+Build a very simple, single-purpose mobile-first web app for generating GST tax invoice PDFs for a small business, Rudra Enterprises. There is no backend server, no database, and no user accounts required — this should be as lightweight as possible.
+
+### What this app does
+
+Rudra Enterprises (the seller) issues tax invoices to exactly two recurring buyers: **Kaka Tile Studio** and **My Tile Studio**. Two reference Excel files are provided in this project folder — `kaka_tiles.xlsx` and `My_tiles.xlsx` — each being a real, previously-issued invoice for one of these two buyers. Open both files and use them as the exact visual and textual template for that buyer's invoice. Every label, every line of text, every field position, every line break within a cell, the column layout, and the overall structure must be reproduced exactly as in the corresponding Excel file. Do not change fonts, wording, spacing, capitalization, or field order from what's in the source files. If you need to render this as HTML/CSS to convert to PDF, replicate the Excel layout as closely as visually possible (same field groupings, same left/right column split, same order top to bottom).
+
+**Important:** Treat the Excel files as ground truth. If anything below conflicts with what you find in the actual files, the files win — go re-check them.
+
+### Core flow
+
+1. User opens the app on their phone and picks a buyer: **Kaka Tile Studio** or **My Tile Studio**.
+2. Based on that choice, the app loads that buyer's fixed invoice template (see "Fixed data" below).
+3. The user is shown a form with exactly three inputs:
+   - **Invoice Number**
+   - **Invoice Date**
+   - **Quantity**
+4. The user submits, sees a quick preview/summary of the computed values, confirms, and the app generates a PDF that looks exactly like the corresponding buyer's original invoice layout, with only the invoice number, date, quantity, and the values derived from quantity filled in.
+5. The PDF is automatically named `<InvoiceNumber>.pdf`.
+6. The result screen offers **Share** (using the device's native share sheet via the Web Share API, so it can be shared directly to WhatsApp/email/etc.) and **Download** as a fallback if native sharing isn't supported by the browser.
+
+### Fixed data (identical for both buyers — this is the seller's own data)
+
+Pull this directly from the Excel files (both currently show the same seller block):
+
+- Seller name: RUDRA ENTERPRISES
+- Seller address, contact number, GST IN, state name, email ID — exactly as shown in either file's seller block
+- Bank name, account number, RTGS/IFSC code — from the bank details line
+- Declaration paragraph and "This is a computer generated invoice" footer line — from `kaka_tiles.xlsx` (this line is present there; double-check whether `My_tiles.xlsx` also has it — if it's missing in that file, still include it for both invoices for consistency, since it's clearly standard invoice boilerplate that just wasn't filled into that particular saved copy)
+- "For Rudra Enterprises / Authorised Signatory" signature block
+- Item description: Ceramic Tile
+- HSN/SAC code: 69072300
+- Rate: 1000 (fixed — never editable)
+- Unit: Box
+- CGST: always "Nil"
+- SGST: always "Nil"
+- Transporter Name, Payment Term, Country of origin, Loading Point, Inco Term — fixed values as shown in the files
+
+### Fixed data that differs per buyer (buyer/client block)
+
+Two separate config entries — pull each exactly from its respective file:
+
+- Buyer name
+- Buyer full address
+- Buyer GST number
+- Final Destination
+
+Also note: the two files use **different layouts** for where header fields (Transporter Name, Payment Term, Final Destination, Country of origin, Loading Point, Inco Term, etc.) are placed and grouped. Kaka Tile Studio's layout spreads these across individually labeled rows; My Tile Studio's layout consolidates several of them into one combined text block. Keep each buyer's layout exactly as-is in its own file — do not unify or standardize the two layouts into one shared design.
+
+### User-entered fields (the only 3 things that ever change)
+
+- Invoice Number
+- Invoice Date
+- Quantity (this is the quantity of Boxes ordered; always a single line item — see below)
+
+### Derived / calculated fields (never entered directly, always computed)
+
+- Amount = Quantity × 1000
+- Taxable Value = Amount
+- IGST (18%) = 18% × Taxable Value
+- Total = Taxable Value + IGST
+- Amount Charged in Words = Total, spelled out in words (Indian numbering system — Lakh/Crore, not Million/Billion), formatted as: `Amount charged in words : <Words> Only`
+
+**No rounding at all** — compute and display the exact value as-is (quantity will always produce a whole-rupee result given the fixed rate of 1000, so this should naturally never require rounding, but do not apply any rounding logic regardless).
+
+### Invoice numbering behavior
+
+- The app should **auto-suggest** the next invoice number when a buyer is selected (e.g., remember the last invoice number used for that buyer, in browser local storage, and suggest last + 1).
+- This is a suggestion only — the field must remain freely editable, and the user can overwrite it with any number they want.
+- No invoice history, archive, or list of past invoices is needed. Do not build any record-keeping, invoice list view, or database beyond the simple "remember last number per buyer" local-storage value needed to power the auto-suggestion.
+
+### Scope constraints — keep this strictly simple
+
+- Only these two buyers, hardcoded as fixed configuration. No "add new client" feature, no admin panel, no way to add a third buyer.
+- Always exactly one line item per invoice (Ceramic Tile, from the fixed HSN/rate). Do not build support for multiple line items or additional products.
+- CGST and SGST are always "Nil" — do not build logic for intra-state tax splitting.
+- Rate is always fixed at 1000 — never an input field.
+- No login, no user accounts, no multi-user support — this is a single-operator tool used by one person.
+- No backend database or server-side storage — local storage (for the invoice-number suggestion only) is sufficient. If a backend is technically necessary for PDF generation, keep it as minimal/stateless as possible.
+
+### Mobile-first requirements
+
+- Design for a phone screen first — this will be used almost exclusively on a mobile browser. Desktop should still work, but treat mobile as the primary target, not a responsive afterthought.
+- Buyer selection, the 3-field form, and the preview/confirm screen should all be easy to use one-handed: large tap targets, a numeric keypad for Quantity, a native date picker for Invoice Date.
+- No horizontal scrolling or pinch-zooming should be required at any point.
+
+### PDF generation and sharing
+
+- Generate a PDF that visually matches the source Excel layout for the selected buyer as closely as possible, the whole invoice should be scaled to fit in one page only.
+- Auto-name the output file `<InvoiceNumber>.pdf`.
+- On the result screen, provide a **Share** button that triggers the device's native share sheet (Web Share API with file support) so the PDF can be sent directly via WhatsApp, email, etc.
+- Also provide a plain **Download** option, both as a fallback for browsers/devices where native sharing of files isn't supported, and as an always-available alternative.
+
+### Summary of what should NOT be built
+
+To keep this simple, explicitly do **not** build: user accounts/login, an invoice history or archive, a way to add/edit/remove buyers, multi-line-item support, editable rate/CGST/SGST logic, rounding logic, or any admin/configuration UI beyond what's needed to run the 3-field flow above.
