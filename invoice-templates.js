@@ -1,6 +1,6 @@
 /**
  * Rudra Enterprises Invoice Generator — Template Engine
- * Produces pixel-perfect HTML/CSS representations matching the original Excel invoice templates.
+ * 1:1 Cell-by-Cell Excel Table Replication
  */
 
 function formatIndianNumber(num) {
@@ -12,7 +12,8 @@ function formatIndianNumber(num) {
 }
 
 /**
- * Generates the Kaka Tile Studio invoice HTML matching kaka tiles.xlsx exactly.
+ * Generates the Kaka Tile Studio invoice HTML.
+ * Matches kaka tiles.xlsx cell-by-cell with exact column widths and vertical alignment.
  */
 function generateKakaInvoiceHTML(data) {
   const formattedAmount = formatIndianNumber(data.amount);
@@ -21,237 +22,282 @@ function generateKakaInvoiceHTML(data) {
   const formattedTotal = formatIndianNumber(data.total);
 
   return `
-    <div id="invoice-doc" class="invoice-sheet kaka-theme" style="
-      width: 780px;
+    <div id="invoice-doc" class="invoice-sheet" style="
+      width: 680px;
       margin: 0 auto;
       background: #ffffff;
       color: #000000;
-      font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-      font-size: 12px;
-      line-height: 1.25;
+      font-family: Arial, sans-serif;
       box-sizing: border-box;
       padding: 0;
       -webkit-font-smoothing: antialiased;
     ">
-      <!-- Main Outer Border Box -->
-      <div style="border: 2px solid #000000; box-sizing: border-box;">
-        
-        <!-- Row 1: Header -->
-        <div style="border-bottom: 1.5px solid #000; padding: 5px 12px; text-align: center; position: relative;">
-          <span style="font-size: 15px; font-weight: bold; letter-spacing: 0.5px;">TAX INVOICE</span>
-          <span style="position: absolute; right: 14px; top: 6px; font-size: 11px; font-weight: bold;">1/ 2/ 3</span>
-        </div>
+      <!-- Master Excel Table (Cols A to G) -->
+      <table style="
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        border: 1.5px solid #000;
+        box-sizing: border-box;
+        background: #ffffff;
+      ">
+        <colgroup>
+          <col style="width: 10.5%;"> <!-- A: Sl. No -->
+          <col style="width: 28.5%;"> <!-- B: Description -->
+          <col style="width: 15.5%;"> <!-- C: HSN & Labels -->
+          <col style="width: 15.0%;"> <!-- D: Qty & Values -->
+          <col style="width: 9.0%;">  <!-- E: Rate -->
+          <col style="width: 10.0%;"> <!-- F: Per & Tax Labels -->
+          <col style="width: 11.5%;"> <!-- G: Amount & Tax Values -->
+        </colgroup>
 
-        <!-- Row 2: Spacer -->
-        <div style="height: 12px; border-bottom: 1.5px solid #000; background: #fff;"></div>
+        <tbody>
+          <!-- Row 1: TAX INVOICE Header -->
+          <tr style="height: 28px; border-bottom: 1px solid #000;">
+            <td colspan="7" style="padding: 4px 10px; font-family: 'Times New Roman', serif; font-size: 10.5pt; font-weight: normal; vertical-align: middle;">
+              TAX INVOICE
+              <span style="float: right; font-weight: bold; font-size: 9.5pt;">1/ 2/ 3</span>
+            </td>
+          </tr>
 
-        <!-- Rows 3-14: Seller & Buyer (Left) + Invoice Fields (Right) -->
-        <div style="display: flex; border-bottom: 1.5px solid #000;">
-          
-          <!-- Left Column: Seller & Buyer Info (48%) -->
-          <div style="flex: 0 0 48%; border-right: 1.5px solid #000; box-sizing: border-box;">
-            
-            <!-- Seller Name Label -->
-            <div style="padding: 3px 8px; font-size: 13px; font-weight: bold; border-bottom: 1px solid #000;">
+          <!-- Row 2: Blank Spacer -->
+          <tr style="height: 26px; border-bottom: 1px solid #000;">
+            <td colspan="7"></td>
+          </tr>
+
+          <!-- Row 3: Seller Name Label -->
+          <tr style="height: 20px;">
+            <td colspan="2" style="font-size: 11.5pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000; vertical-align: top;">
               Seller Name
-            </div>
-            
-            <!-- Seller Details -->
-            <div style="padding: 4px 8px; font-size: 12px; line-height: 1.45; border-bottom: 1px solid #000;">
-              <div style="font-weight: bold; font-size: 12px;">RUDRA ENTERPRISES</div>
-              <div>AC-4C, Shalimar Bagh, Delhi-110088</div>
-              <div>Contact No: 9971008585</div>
-              <div>GST IN: 07AAJPK3334Q1ZA</div>
-              <div>State Name: Delhi</div>
-              <div>Email ID: naresh_kalra@yahoo.com</div>
-            </div>
+            </td>
+            <td colspan="5" style="border-bottom: 1px solid #000;"></td>
+          </tr>
 
-            <!-- Buyer Name Label -->
-            <div style="padding: 3px 8px; font-size: 13px; font-weight: bold; border-bottom: 1px solid #000;">
+          <!-- Row 4: RUDRA ENTERPRISES -->
+          <tr style="height: 18px;">
+            <td colspan="2" style="font-size: 10.5pt; padding: 2px 6px; border-right: 1px solid #000; vertical-align: top;">
+              RUDRA ENTERPRISES
+            </td>
+            <td colspan="5"></td>
+          </tr>
+
+          <!-- Row 5: Invoice No -->
+          <tr style="height: 18px;">
+            <td colspan="2" style="font-size: 10.5pt; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              AC-4C, Shalimar Bagh, Delhi-110088
+            </td>
+            <td style="font-size: 8.5pt; font-weight: bold; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              Invoice No.
+            </td>
+            <td colspan="4" style="font-size: 8.5pt; padding: 1px 6px; vertical-align: top;">
+              ${data.invoiceNo}
+            </td>
+          </tr>
+
+          <!-- Row 6: Spacer -->
+          <tr style="height: 15px;">
+            <td colspan="2" style="border-right: 1px solid #000;"></td>
+            <td style="border-right: 1px solid #000;"></td>
+            <td colspan="4"></td>
+          </tr>
+
+          <!-- Row 7: Invoice Date -->
+          <tr style="height: 16px;">
+            <td colspan="2" style="border-right: 1px solid #000;"></td>
+            <td style="font-size: 8.5pt; font-weight: bold; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              Invoice date
+            </td>
+            <td colspan="4" style="font-size: 8.5pt; padding: 1px 6px; vertical-align: top;">
+              ${data.invoiceDate}
+            </td>
+          </tr>
+
+          <!-- Row 8: Transporter Name -->
+          <tr style="height: 18px;">
+            <td colspan="2" style="font-size: 10.5pt; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              Contact No: 9971008585
+            </td>
+            <td style="font-size: 8.5pt; font-weight: bold; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              Transporter Name
+            </td>
+            <td colspan="4" style="font-size: 8.5pt; padding: 1px 6px; vertical-align: top;">
+              Okara Parcel
+            </td>
+          </tr>
+
+          <!-- Row 9: Payment Term -->
+          <tr style="height: 18px;">
+            <td colspan="2" style="font-size: 10.5pt; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              GST IN: 07AAJPK3334Q1ZA
+            </td>
+            <td style="font-size: 8.5pt; font-weight: bold; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              Payment Term
+            </td>
+            <td colspan="4" style="font-size: 8.5pt; padding: 1px 6px; vertical-align: top;">
+              45 Days
+            </td>
+          </tr>
+
+          <!-- Row 10: Destination -->
+          <tr style="height: 18px;">
+            <td colspan="2" style="font-size: 10.5pt; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              State Name: Delhi
+            </td>
+            <td style="font-size: 8.5pt; font-weight: bold; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              Destination
+            </td>
+            <td colspan="4" style="font-size: 8.5pt; padding: 1px 6px; vertical-align: top;"></td>
+          </tr>
+
+          <!-- Row 11: Final Destination -->
+          <tr style="height: 20px;">
+            <td colspan="2" style="font-size: 10.5pt; padding: 1px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000; vertical-align: top;">
+              Email ID: naresh_kalra@yahoo.com
+            </td>
+            <td style="font-size: 8.5pt; font-weight: bold; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              Final Destination
+            </td>
+            <td colspan="4" style="font-size: 8.5pt; padding: 1px 6px; vertical-align: top;">
+              Telengana
+            </td>
+          </tr>
+
+          <!-- Row 12: Country of Origin -->
+          <tr style="height: 18px;">
+            <td colspan="2" rowspan="2" style="font-size: 11.5pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000; vertical-align: top;">
               Buyer Name
-            </div>
+            </td>
+            <td style="font-size: 8.5pt; font-weight: bold; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              Country of origin
+            </td>
+            <td colspan="4" style="font-size: 8.5pt; padding: 1px 6px; vertical-align: top;">
+              India
+            </td>
+          </tr>
 
-            <!-- Buyer Details -->
-            <div style="padding: 4px 8px; font-size: 12px; line-height: 1.45; min-height: 58px;">
-              <div style="font-weight: bold;">Kaka Tile Studio</div>
-              <div>104 Sagar Enclave, Hyderabad, Telengana 500035</div>
-            </div>
-          </div>
+          <!-- Row 13: Loading Point -->
+          <tr style="height: 18px;">
+            <td style="font-size: 8.5pt; font-weight: bold; padding: 1px 6px; border-right: 1px solid #000; vertical-align: top;">
+              Loading Point
+            </td>
+            <td colspan="4" style="font-size: 8.5pt; padding: 1px 6px; vertical-align: top;">
+              Delhi
+            </td>
+          </tr>
 
-          <!-- Right Column: Meta Fields (52%) -->
-          <div style="flex: 1; display: flex; flex-direction: column;">
-            
-            <!-- Empty Row aligning with Seller Name -->
-            <div style="height: 24px; border-bottom: 1px solid #000;"></div>
+          <!-- Row 14: Kaka Tile Studio Address Block -->
+          <tr style="height: 72px;">
+            <td colspan="2" style="font-size: 10.5pt; font-weight: bold; padding: 3px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000; vertical-align: top; line-height: 1.45;">
+              Kaka Tile Studio<br>104 Sagar Enclave, Hyderabad, Telengana 500035
+            </td>
+            <td colspan="5" style="border-bottom: 1px solid #000;"></td>
+          </tr>
 
-            <!-- Invoice No -->
-            <div style="display: flex; border-bottom: 1px solid #000;">
-              <div style="flex: 0 0 45%; padding: 3px 8px; font-weight: bold; border-right: 1.5px solid #000; font-size: 11px;">Invoice No.</div>
-              <div style="flex: 1; padding: 3px 8px; font-size: 11px;">${data.invoiceNo}</div>
-            </div>
+          <!-- Row 15 & 16: GST NO & Inco Term -->
+          <tr style="height: 20px;">
+            <td style="font-size: 10.5pt; font-weight: bold; padding: 2px 6px; border-bottom: 1px solid #000; white-space: nowrap;">
+              GST NO.
+            </td>
+            <td style="font-size: 10.5pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+              36AAWFK9520H1ZS
+            </td>
+            <td style="font-family: 'Times New Roman', serif; font-size: 9.5pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000;">
+              Inco Term
+            </td>
+            <td colspan="4" style="font-size: 8.5pt; padding: 2px 6px; border-bottom: 1px solid #000;">
+              FOB
+            </td>
+          </tr>
 
-            <!-- Spacer aligning with seller address -->
-            <div style="height: 16px; border-bottom: 1px solid #000;"></div>
+          <!-- Row 17: Table Headers -->
+          <tr style="font-size: 8.5pt; font-weight: bold; height: 20px; border-bottom: 1px solid #000;">
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: left;">Sl. No</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: left;">Description of Goods</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: left;">HSN/SAC</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: left;">Quantity</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center;">Rate</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center;">Per</td>
+            <td style="padding: 2px 4px; text-align: left;">Amount</td>
+          </tr>
 
-            <!-- Invoice Date -->
-            <div style="display: flex; border-bottom: 1px solid #000;">
-              <div style="flex: 0 0 45%; padding: 3px 8px; font-weight: bold; border-right: 1.5px solid #000; font-size: 11px;">Invoice date</div>
-              <div style="flex: 1; padding: 3px 8px; font-size: 11px;">${data.invoiceDate}</div>
-            </div>
+          <!-- Row 18: Line Item with natural tall whitespace below text -->
+          <tr style="font-size: 8.5pt; font-weight: bold; height: 110px; vertical-align: top; border-bottom: 1px solid #000;">
+            <td style="padding: 3px 4px; border-right: 1px solid #000; text-align: center; font-weight: normal;">1</td>
+            <td style="padding: 3px 4px; border-right: 1px solid #000;">Ceramic Tile</td>
+            <td style="padding: 3px 4px; border-right: 1px solid #000;">69072300</td>
+            <td style="padding: 3px 4px; border-right: 1px solid #000; text-align: center;">${data.quantity}</td>
+            <td style="padding: 3px 4px; border-right: 1px solid #000; text-align: center;">1000</td>
+            <td style="padding: 3px 4px; border-right: 1px solid #000; text-align: center;">Box</td>
+            <td style="padding: 3px 4px; text-align: right;">${formattedAmount}</td>
+          </tr>
 
-            <!-- Transporter Name -->
-            <div style="display: flex; border-bottom: 1px solid #000;">
-              <div style="flex: 0 0 45%; padding: 3px 8px; font-weight: bold; border-right: 1.5px solid #000; font-size: 11px;">Transporter Name</div>
-              <div style="flex: 1; padding: 3px 8px; font-size: 11px;">Okara Parcel</div>
-            </div>
+          <!-- Row 19: Taxable Value -->
+          <tr style="font-size: 8.5pt; font-weight: bold; height: 20px; border-bottom: 1px solid #000;">
+            <td colspan="5" style="border-right: 1px solid #000;"></td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center; white-space: nowrap;">Taxable Value</td>
+            <td style="padding: 2px 4px; text-align: right;">${formattedTaxable}</td>
+          </tr>
 
-            <!-- Payment Term -->
-            <div style="display: flex; border-bottom: 1px solid #000;">
-              <div style="flex: 0 0 45%; padding: 3px 8px; font-weight: bold; border-right: 1.5px solid #000; font-size: 11px;">Payment Term</div>
-              <div style="flex: 1; padding: 3px 8px; font-size: 11px;">45 Days</div>
-            </div>
+          <!-- Row 20: CGST -->
+          <tr style="font-size: 8.5pt; font-weight: bold; height: 20px; border-bottom: 1px solid #000;">
+            <td colspan="5" style="border-right: 1px solid #000;"></td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center;">CGST</td>
+            <td style="padding: 2px 4px; text-align: right;">Nil</td>
+          </tr>
 
-            <!-- Destination -->
-            <div style="display: flex; border-bottom: 1px solid #000;">
-              <div style="flex: 0 0 45%; padding: 3px 8px; font-weight: bold; border-right: 1.5px solid #000; font-size: 11px;">Destination</div>
-              <div style="flex: 1; padding: 3px 8px; font-size: 11px;"></div>
-            </div>
+          <!-- Row 21: SGST -->
+          <tr style="font-size: 8.5pt; font-weight: bold; height: 20px; border-bottom: 1px solid #000;">
+            <td colspan="5" style="border-right: 1px solid #000;"></td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center;">SGST</td>
+            <td style="padding: 2px 4px; text-align: right;">Nil</td>
+          </tr>
 
-            <!-- Final Destination -->
-            <div style="display: flex; border-bottom: 1px solid #000;">
-              <div style="flex: 0 0 45%; padding: 3px 8px; font-weight: bold; border-right: 1.5px solid #000; font-size: 11px;">Final Destination</div>
-              <div style="flex: 1; padding: 3px 8px; font-size: 11px;">Telengana</div>
-            </div>
+          <!-- Row 22: IGST (18%) -->
+          <tr style="font-size: 8.5pt; font-weight: bold; height: 20px; border-bottom: 1px solid #000;">
+            <td colspan="5" style="border-right: 1px solid #000;"></td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center; white-space: nowrap;">IGST (18%)</td>
+            <td style="padding: 2px 4px; text-align: right;">${formattedIGST}</td>
+          </tr>
 
-            <!-- Country of origin -->
-            <div style="display: flex; border-bottom: 1px solid #000;">
-              <div style="flex: 0 0 45%; padding: 3px 8px; font-weight: bold; border-right: 1.5px solid #000; font-size: 11px;">Country of origin</div>
-              <div style="flex: 1; padding: 3px 8px; font-size: 11px;">India</div>
-            </div>
+          <!-- Row 23: Total Amount & Total -->
+          <tr style="font-size: 8.5pt; font-weight: bold; height: 28px; border-bottom: 1px solid #000;">
+            <td style="border-right: 1px solid #000;"></td>
+            <td style="padding: 3px 4px; border-right: 1px solid #000; font-size: 9.5pt;">Total Amount</td>
+            <td colspan="3" style="border-right: 1px solid #000;"></td>
+            <td style="padding: 3px 4px; border-right: 1px solid #000; text-align: right;">Total</td>
+            <td style="padding: 3px 4px; text-align: right;">${formattedTotal}</td>
+          </tr>
 
-            <!-- Loading Point -->
-            <div style="display: flex;">
-              <div style="flex: 0 0 45%; padding: 3px 8px; font-weight: bold; border-right: 1.5px solid #000; font-size: 11px;">Loading Point</div>
-              <div style="flex: 1; padding: 3px 8px; font-size: 11px;">Delhi</div>
-            </div>
+          <!-- Row 24: Amount in Words -->
+          <tr style="border-bottom: 1px solid #000; height: 26px;">
+            <td colspan="7" style="padding: 3px 6px; font-size: 11pt; text-align: center; font-weight: normal;">
+              Amount charged in words : ${data.amountInWords}
+            </td>
+          </tr>
 
-          </div>
-        </div>
+          <!-- Row 25 & 26: Bank Details & Declaration (Left), Signatory (Right) -->
+          <tr>
+            <td colspan="3" style="font-family: 'Times New Roman', serif; font-size: 9.5pt; padding: 4px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000; height: 50px; vertical-align: top; line-height: 1.45;">
+              Bank Name  : HDFC<br>
+              Bank Account No.  50200004017434 RTGS/IFS Code :HDFC0000331
+            </td>
+            <td colspan="4" rowspan="2" style="font-family: 'Times New Roman', serif; font-size: 9.5pt; padding: 6px 12px; vertical-align: top; line-height: 1.4;">
+              For Rudra Enterprises<br><br><br>
+              Authorised Signatory
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3" style="font-family: 'Times New Roman', serif; font-size: 9.5pt; padding: 4px 6px; border-right: 1px solid #000; height: 44px; vertical-align: top; line-height: 1.35;">
+              Declaration<br>
+              We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct
+            </td>
+          </tr>
 
-        <!-- Row 15-16: GST NO & Inco Term -->
-        <div style="display: flex; border-bottom: 1.5px solid #000;">
-          <div style="flex: 0 0 48%; padding: 3px 8px; font-weight: bold; font-size: 12px; border-right: 1.5px solid #000; box-sizing: border-box;">
-            GST NO.&nbsp;&nbsp;&nbsp;36AAWFK9520H1ZS
-          </div>
-          <div style="flex: 1; display: flex;">
-            <div style="flex: 0 0 45%; padding: 3px 8px; font-weight: bold; font-size: 11px; border-right: 1.5px solid #000;">Inco Term</div>
-            <div style="flex: 1; padding: 3px 8px; font-size: 11px;">FOB</div>
-          </div>
-        </div>
+        </tbody>
+      </table>
 
-        <!-- Table: Items & Pricing -->
-        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 11px;">
-          <thead>
-            <tr style="border-bottom: 1.5px solid #000; font-weight: bold;">
-              <th style="width: 7%; padding: 4px 6px; border-right: 1px solid #000; text-align: left;">Sl. No</th>
-              <th style="width: 25%; padding: 4px 6px; border-right: 1px solid #000; text-align: left;">Description of Goods</th>
-              <th style="width: 14%; padding: 4px 6px; border-right: 1px solid #000; text-align: center;">HSN/SAC</th>
-              <th style="width: 14%; padding: 4px 6px; border-right: 1px solid #000; text-align: center;">Quantity</th>
-              <th style="width: 10%; padding: 4px 6px; border-right: 1px solid #000; text-align: center;">Rate</th>
-              <th style="width: 10%; padding: 4px 6px; border-right: 1px solid #000; text-align: center;">Per</th>
-              <th style="width: 20%; padding: 4px 6px; text-align: right;">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Line Item Row -->
-            <tr style="font-weight: bold;">
-              <td style="padding: 4px 6px; border-right: 1px solid #000; text-align: center;">1</td>
-              <td style="padding: 4px 6px; border-right: 1px solid #000;">Ceramic Tile</td>
-              <td style="padding: 4px 6px; border-right: 1px solid #000; text-align: center;">69072300</td>
-              <td style="padding: 4px 6px; border-right: 1px solid #000; text-align: center;">${data.quantity}</td>
-              <td style="padding: 4px 6px; border-right: 1px solid #000; text-align: center;">1000</td>
-              <td style="padding: 4px 6px; border-right: 1px solid #000; text-align: center;">Box</td>
-              <td style="padding: 4px 6px; text-align: right;">${formattedAmount}</td>
-            </tr>
-
-            <!-- Empty Vertical Space preserving table lines -->
-            <tr style="height: 100px;">
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="border-right: 1px solid #000;"></td>
-              <td></td>
-            </tr>
-
-            <!-- Taxable Value -->
-            <tr style="border-top: 1px solid #000; border-bottom: 1px solid #000;">
-              <td colspan="5" style="border-right: 1px solid #000;"></td>
-              <td style="padding: 3px 6px; font-weight: bold; border-right: 1px solid #000; text-align: center;">Taxable Value</td>
-              <td style="padding: 3px 6px; font-weight: bold; text-align: right;">${formattedTaxable}</td>
-            </tr>
-
-            <!-- CGST -->
-            <tr style="border-bottom: 1px solid #000;">
-              <td colspan="5" style="border-right: 1px solid #000;"></td>
-              <td style="padding: 3px 6px; font-weight: bold; border-right: 1px solid #000; text-align: center;">CGST</td>
-              <td style="padding: 3px 6px; font-weight: bold; text-align: right;">Nil</td>
-            </tr>
-
-            <!-- SGST -->
-            <tr style="border-bottom: 1px solid #000;">
-              <td colspan="5" style="border-right: 1px solid #000;"></td>
-              <td style="padding: 3px 6px; font-weight: bold; border-right: 1px solid #000; text-align: center;">SGST</td>
-              <td style="padding: 3px 6px; font-weight: bold; text-align: right;">Nil</td>
-            </tr>
-
-            <!-- IGST -->
-            <tr style="border-bottom: 1.5px solid #000;">
-              <td colspan="5" style="border-right: 1px solid #000;"></td>
-              <td style="padding: 3px 6px; font-weight: bold; border-right: 1px solid #000; text-align: center;">IGST (18%)</td>
-              <td style="padding: 3px 6px; font-weight: bold; text-align: right;">${formattedIGST}</td>
-            </tr>
-
-            <!-- Total -->
-            <tr style="border-bottom: 1.5px solid #000; font-weight: bold;">
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="padding: 4px 6px; border-right: 1px solid #000;">Total Amount</td>
-              <td colspan="3" style="border-right: 1px solid #000;"></td>
-              <td style="padding: 4px 6px; border-right: 1px solid #000; text-align: center;">Total</td>
-              <td style="padding: 4px 6px; text-align: right;">${formattedTotal}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Amount charged in words -->
-        <div style="border-bottom: 1.5px solid #000; padding: 6px 12px; font-size: 13px; font-weight: bold; text-align: center;">
-          Amount charged in words : ${data.amountInWords}
-        </div>
-
-        <!-- Bank Details & Signatory -->
-        <div style="display: flex; border-bottom: 1.5px solid #000;">
-          <div style="flex: 0 0 52%; padding: 6px 8px; font-size: 11px; border-right: 1.5px solid #000; box-sizing: border-box; min-height: 48px;">
-            <div>Bank Name  : HDFC</div>
-            <div>Bank Account No.  50200004017434 RTGS/IFS Code :HDFC0000331</div>
-          </div>
-          <div style="flex: 1; padding: 6px 10px; font-size: 11px;">
-            <div style="font-weight: bold;">For Rudra Enterprises</div>
-            <div style="height: 28px;"></div>
-            <div>Authorised Signatory</div>
-          </div>
-        </div>
-
-        <!-- Declaration -->
-        <div style="padding: 6px 8px; font-size: 11px; line-height: 1.35;">
-          <div style="font-weight: bold;">Declaration</div>
-          <div>We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct</div>
-        </div>
-
-      </div>
-
-      <!-- Footer Outside Border -->
-      <div style="padding: 4px 0 2px 0; font-size: 11px; font-weight: bold; text-align: center;">
+      <!-- Row 27: Footer Outside Border -->
+      <div style="padding: 4px 0 2px 0; font-size: 8.5pt; font-weight: bold; text-align: center;">
         This is a computer generated invoice
       </div>
     </div>
@@ -259,7 +305,8 @@ function generateKakaInvoiceHTML(data) {
 }
 
 /**
- * Generates the My Tile Studio invoice HTML matching My tiles.xlsx exactly.
+ * Generates the My Tile Studio invoice HTML.
+ * Matches My tiles.xlsx cell-by-cell with consolidated header layout.
  */
 function generateMyTilesInvoiceHTML(data) {
   const formattedAmount = formatIndianNumber(data.amount);
@@ -268,215 +315,202 @@ function generateMyTilesInvoiceHTML(data) {
   const formattedTotal = formatIndianNumber(data.total);
 
   return `
-    <div id="invoice-doc" class="invoice-sheet my-theme" style="
-      width: 780px;
+    <div id="invoice-doc" class="invoice-sheet" style="
+      width: 680px;
       margin: 0 auto;
       background: #ffffff;
       color: #000000;
-      font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
-      font-size: 12px;
-      line-height: 1.25;
+      font-family: Arial, sans-serif;
       box-sizing: border-box;
       padding: 0;
       -webkit-font-smoothing: antialiased;
     ">
-      <!-- Main Outer Border Box -->
-      <div style="border: 2px solid #000000; box-sizing: border-box;">
-        
-        <!-- Row 1: Header -->
-        <div style="border-bottom: 1.5px solid #000; padding: 5px 12px; text-align: center; position: relative;">
-          <span style="font-size: 15px; font-weight: bold; letter-spacing: 0.5px;">TAX INVOICE</span>
-          <span style="position: absolute; right: 14px; top: 6px; font-size: 11px; font-weight: bold;">1/ 2/ 3</span>
-        </div>
+      <!-- Master Excel Table (Cols A to G) -->
+      <table style="
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        border: 1px solid #000;
+        box-sizing: border-box;
+        background: #ffffff;
+      ">
+        <colgroup>
+          <col style="width: 11.0%;"> <!-- A: Sl. No -->
+          <col style="width: 26.5%;"> <!-- B: Description -->
+          <col style="width: 15.0%;"> <!-- C: Labels -->
+          <col style="width: 16.0%;"> <!-- D: Values -->
+          <col style="width: 9.5%;">  <!-- E: Rate -->
+          <col style="width: 10.5%;"> <!-- F: Per & Tax Labels -->
+          <col style="width: 11.5%;"> <!-- G: Amount & Tax Values -->
+        </colgroup>
 
-        <!-- Row 2: Spacer -->
-        <div style="height: 10px; border-bottom: 1.5px solid #000; background: #fff;"></div>
+        <tbody>
+          <!-- Row 1: TAX INVOICE Header -->
+          <tr style="height: 22px; border-bottom: 1px solid #000;">
+            <td colspan="7" style="padding: 2px 8px; font-family: 'Times New Roman', serif; font-size: 9.5pt; font-weight: normal; vertical-align: middle;">
+              TAX INVOICE
+              <span style="float: right; font-weight: bold; font-size: 9pt;">1/ 2/ 3</span>
+            </td>
+          </tr>
 
-        <!-- Rows 3-7: Seller & Buyer (Left) + Consolidated Details (Right) -->
-        <div style="display: flex; border-bottom: 1.5px solid #000;">
-          
-          <!-- Left Column (38%) -->
-          <div style="flex: 0 0 38%; border-right: 1.5px solid #000; box-sizing: border-box;">
-            
-            <!-- Seller Name Label -->
-            <div style="padding: 2px 6px; font-size: 12px; font-weight: bold; border-bottom: 1px solid #000;">
+          <!-- Row 2: Blank Spacer -->
+          <tr style="height: 20px; border-bottom: 1px solid #000;">
+            <td colspan="7"></td>
+          </tr>
+
+          <!-- Row 3 & 4: Seller Info (Left) + Consolidated Details (Right) -->
+          <tr>
+            <td colspan="2" style="font-size: 8.5pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000; vertical-align: top;">
               Seller Name
-            </div>
-            
-            <!-- Seller Details Block -->
-            <div style="padding: 4px 6px; font-size: 11px; line-height: 1.45; border-bottom: 1px solid #000;">
-              <div style="font-weight: bold;">RUDRA ENTERPRISES</div>
-              <div>AC-4C, Shalimar Bagh, Delhi-110088 Contact No: 9971008585</div>
-              <div>GST IN: 07AAJPK3334Q1ZA</div>
-              <div>State Name: Delhi</div>
-              <div>Email ID: naresh_kalra@yahoo.com</div>
-            </div>
+            </td>
+            <td style="font-size: 8pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000; vertical-align: top; line-height: 1.6;" rowspan="2">
+              Invoice No.<br>
+              Invoice date Transporter Name<br>
+              Payment Term<br>
+              Final Destination<br>
+              Country of origin Loading Point
+            </td>
+            <td colspan="4" style="font-size: 8pt; padding: 2px 6px; vertical-align: top; line-height: 1.6;" rowspan="2">
+              ${data.invoiceNo}<br>
+              ${data.invoiceDate}<br>
+              Okara Parcel &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 45 Days<br>
+              <br>
+              Telengana &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; India<br>
+              Delhi
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #000;">
+            <td colspan="2" style="font-size: 9.5pt; padding: 2px 6px; border-right: 1px solid #000; vertical-align: top; line-height: 1.45;">
+              RUDRA ENTERPRISES<br>
+              AC-4C, Shalimar Bagh, Delhi-110088 Contact No: 9971008585<br>
+              GST IN: 07AAJPK3334Q1ZA<br>
+              State Name: Delhi<br>
+              Email ID: naresh_kalra@yahoo.com
+            </td>
+          </tr>
 
-            <!-- Buyer Name Label -->
-            <div style="padding: 2px 6px; font-size: 12px; font-weight: bold; border-bottom: 1px solid #000;">
+          <!-- Row 5: Buyer Name Label -->
+          <tr style="height: 18px; border-bottom: 1px solid #000;">
+            <td colspan="2" style="font-size: 8.5pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000;">
               Buyer Name
-            </div>
+            </td>
+            <td colspan="5" rowspan="2" style="border-bottom: 1px solid #000;"></td>
+          </tr>
 
-            <!-- Buyer Details Block -->
-            <div style="padding: 4px 6px; font-size: 11px; line-height: 1.35; min-height: 60px;">
-              <div style="font-weight: bold;">My Tile Studio</div>
-              <div>MCH No. – 8-16-61/PLOT NO 6</div>
-              <div>Sagar Road</div>
-              <div>Hyderabad</div>
-              <div>Telengana</div>
-              <div>500079</div>
-            </div>
+          <!-- Row 6: Buyer Details Block -->
+          <tr style="height: 70px; border-bottom: 1px solid #000;">
+            <td colspan="2" style="font-size: 9pt; padding: 2px 6px; border-right: 1px solid #000; vertical-align: top; line-height: 1.35;">
+              My Tile Studio<br>
+              MCH No. – 8-16-61/PLOT NO 6<br>
+              Sagar Road<br>
+              Hyderabad<br>
+              Telengana<br>
+              500079
+            </td>
+          </tr>
 
-          </div>
+          <!-- Row 7 & 8: GST NO & Inco Term -->
+          <tr style="height: 18px; border-bottom: 1px solid #000;">
+            <td colspan="2" style="font-size: 8pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000;">
+              GST NO. &nbsp;36BBCPK7265H1ZI
+            </td>
+            <td style="font-size: 7pt; font-weight: bold; padding: 2px 6px; border-right: 1px solid #000;">
+              Inco Term
+            </td>
+            <td colspan="4" style="font-size: 6.5pt; padding: 2px 6px;">
+              FOB
+            </td>
+          </tr>
 
-          <!-- Right Column (62%): Labels & Values -->
-          <div style="flex: 1; display: flex; flex-direction: column;">
-            
-            <!-- Details Grid -->
-            <div style="display: flex; flex: 1;">
-              
-              <!-- Labels Column -->
-              <div style="flex: 0 0 35%; padding: 4px 8px; font-size: 11px; font-weight: bold; line-height: 1.7; border-right: 1.5px solid #000;">
-                <div>Invoice No.</div>
-                <div>Invoice date</div>
-                <div>Transporter Name</div>
-                <div>Payment Term</div>
-                <div>Final Destination</div>
-                <div>Country of origin</div>
-                <div>Loading Point</div>
-              </div>
+          <!-- Row 9: Table Headers -->
+          <tr style="font-size: 6.5pt; font-weight: bold; height: 18px; border-bottom: 1px solid #000;">
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: left;">Sl. No</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: left;">Description of Goods</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: right;">HSN/SAC</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center;">Quantity</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center;">Rate</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center;">Per</td>
+            <td style="padding: 2px 4px; text-align: left;">Amount</td>
+          </tr>
 
-              <!-- Values Column -->
-              <div style="flex: 1; padding: 4px 8px; font-size: 11px; line-height: 1.7;">
-                <div>${data.invoiceNo}</div>
-                <div>${data.invoiceDate}</div>
-                <div>Okara Parcel</div>
-                <div>45 Days</div>
-                <div>Telengana</div>
-                <div>India</div>
-                <div>Delhi</div>
-              </div>
+          <!-- Row 10: Line Item -->
+          <tr style="font-size: 6.5pt; font-weight: bold; height: 80px; vertical-align: top; border-bottom: 1px solid #000;">
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center; font-weight: normal;">1</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000;">Ceramic Tile</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: right;">69072300</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center;">${data.quantity}</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center;">1000</td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: center;">Box</td>
+            <td style="padding: 2px 4px; text-align: right;">${formattedAmount}</td>
+          </tr>
 
-            </div>
+          <!-- Row 11: Taxable Value -->
+          <tr style="font-size: 6.5pt; font-weight: bold; height: 16px; border-bottom: 1px solid #000;">
+            <td colspan="5" style="border-right: 1px solid #000;"></td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: right; white-space: nowrap;">Taxable Value</td>
+            <td style="padding: 2px 4px; text-align: right;">${formattedTaxable}</td>
+          </tr>
 
-          </div>
+          <!-- Row 12: CGST -->
+          <tr style="font-size: 6.5pt; font-weight: bold; height: 16px; border-bottom: 1px solid #000;">
+            <td colspan="5" style="border-right: 1px solid #000;"></td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: left;">CGST</td>
+            <td style="padding: 2px 4px; text-align: right;">Nil</td>
+          </tr>
 
-        </div>
+          <!-- Row 13: SGST -->
+          <tr style="font-size: 6.5pt; font-weight: bold; height: 16px; border-bottom: 1px solid #000;">
+            <td colspan="5" style="border-right: 1px solid #000;"></td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: left;">SGST</td>
+            <td style="padding: 2px 4px; text-align: right;">Nil</td>
+          </tr>
 
-        <!-- Row 8: GST NO & Inco Term -->
-        <div style="display: flex; border-bottom: 1.5px solid #000;">
-          <div style="flex: 0 0 38%; padding: 3px 6px; font-weight: bold; font-size: 11px; border-right: 1.5px solid #000; box-sizing: border-box;">
-            GST NO.&nbsp;&nbsp;36BBCPK7265H1ZI
-          </div>
-          <div style="flex: 1; display: flex;">
-            <div style="flex: 0 0 35%; padding: 3px 8px; font-weight: bold; font-size: 11px; border-right: 1.5px solid #000;">Inco Term</div>
-            <div style="flex: 1; padding: 3px 8px; font-size: 11px;">FOB</div>
-          </div>
-        </div>
+          <!-- Row 14: IGST (18%) -->
+          <tr style="font-size: 6.5pt; font-weight: bold; height: 16px; border-bottom: 1px solid #000;">
+            <td colspan="5" style="border-right: 1px solid #000;"></td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: left; white-space: nowrap;">IGST (18%)</td>
+            <td style="padding: 2px 4px; text-align: right;">${formattedIGST}</td>
+          </tr>
 
-        <!-- Table: Items & Pricing -->
-        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 11px;">
-          <thead>
-            <tr style="border-bottom: 1.5px solid #000; font-weight: bold;">
-              <th style="width: 7%; padding: 3px 6px; border-right: 1px solid #000; text-align: left;">Sl. No</th>
-              <th style="width: 25%; padding: 3px 6px; border-right: 1px solid #000; text-align: left;">Description of Goods</th>
-              <th style="width: 14%; padding: 3px 6px; border-right: 1px solid #000; text-align: center;">HSN/SAC</th>
-              <th style="width: 14%; padding: 3px 6px; border-right: 1px solid #000; text-align: center;">Quantity</th>
-              <th style="width: 10%; padding: 3px 6px; border-right: 1px solid #000; text-align: center;">Rate</th>
-              <th style="width: 10%; padding: 3px 6px; border-right: 1px solid #000; text-align: center;">Per</th>
-              <th style="width: 20%; padding: 3px 6px; text-align: right;">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Line Item Row -->
-            <tr style="font-weight: bold;">
-              <td style="padding: 3px 6px; border-right: 1px solid #000; text-align: center;">1</td>
-              <td style="padding: 3px 6px; border-right: 1px solid #000;">Ceramic Tile</td>
-              <td style="padding: 3px 6px; border-right: 1px solid #000; text-align: center;">69072300</td>
-              <td style="padding: 3px 6px; border-right: 1px solid #000; text-align: center;">${data.quantity}</td>
-              <td style="padding: 3px 6px; border-right: 1px solid #000; text-align: center;">1000</td>
-              <td style="padding: 3px 6px; border-right: 1px solid #000; text-align: center;">Box</td>
-              <td style="padding: 3px 6px; text-align: right;">${formattedAmount}</td>
-            </tr>
+          <!-- Row 15: Total Amount & Total -->
+          <tr style="font-size: 6.5pt; font-weight: bold; height: 22px; border-bottom: 1px solid #000;">
+            <td style="border-right: 1px solid #000;"></td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; font-size: 7pt;">Total Amount</td>
+            <td colspan="3" style="border-right: 1px solid #000;"></td>
+            <td style="padding: 2px 4px; border-right: 1px solid #000; text-align: right;">Total</td>
+            <td style="padding: 2px 4px; text-align: right;">${formattedTotal}</td>
+          </tr>
 
-            <!-- Empty Vertical Space -->
-            <tr style="height: 95px;">
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="border-right: 1px solid #000;"></td>
-              <td></td>
-            </tr>
+          <!-- Row 16: Words -->
+          <tr style="border-bottom: 1px solid #000; height: 22px;">
+            <td colspan="7" style="padding: 3px 6px; font-size: 9.5pt; text-align: center; font-weight: normal;">
+              Amount charged in words : ${data.amountInWords}
+            </td>
+          </tr>
 
-            <!-- Taxable Value -->
-            <tr style="border-top: 1px solid #000; border-bottom: 1px solid #000;">
-              <td colspan="5" style="border-right: 1px solid #000;"></td>
-              <td style="padding: 3px 6px; font-weight: bold; border-right: 1px solid #000; text-align: center;">Taxable Value</td>
-              <td style="padding: 3px 6px; font-weight: bold; text-align: right;">${formattedTaxable}</td>
-            </tr>
+          <!-- Row 17 & 18: Bank Details, Signatory, Declaration -->
+          <tr>
+            <td colspan="3" style="font-size: 9.5pt; padding: 3px 6px; border-right: 1px solid #000; border-bottom: 1px solid #000; height: 44px; vertical-align: top; line-height: 1.35;">
+              Bank Name  : HDFC<br>
+              Bank Account No.  50200004017434 RTGS/IFS Code :HDFC0000331
+            </td>
+            <td colspan="4" rowspan="2" style="font-size: 9.5pt; padding: 4px 8px; vertical-align: top; line-height: 1.35;">
+              For Rudra Enterprises<br><br><br>
+              Authorised Signatory
+            </td>
+          </tr>
+          <tr>
+            <td colspan="3" style="font-size: 9.5pt; padding: 3px 6px; border-right: 1px solid #000; height: 36px; vertical-align: top; line-height: 1.3;">
+              Declaration<br>
+              We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct
+            </td>
+          </tr>
 
-            <!-- CGST -->
-            <tr style="border-bottom: 1px solid #000;">
-              <td colspan="5" style="border-right: 1px solid #000;"></td>
-              <td style="padding: 3px 6px; font-weight: bold; border-right: 1px solid #000; text-align: center;">CGST</td>
-              <td style="padding: 3px 6px; font-weight: bold; text-align: right;">Nil</td>
-            </tr>
-
-            <!-- SGST -->
-            <tr style="border-bottom: 1px solid #000;">
-              <td colspan="5" style="border-right: 1px solid #000;"></td>
-              <td style="padding: 3px 6px; font-weight: bold; border-right: 1px solid #000; text-align: center;">SGST</td>
-              <td style="padding: 3px 6px; font-weight: bold; text-align: right;">Nil</td>
-            </tr>
-
-            <!-- IGST -->
-            <tr style="border-bottom: 1.5px solid #000;">
-              <td colspan="5" style="border-right: 1px solid #000;"></td>
-              <td style="padding: 3px 6px; font-weight: bold; border-right: 1px solid #000; text-align: center;">IGST (18%)</td>
-              <td style="padding: 3px 6px; font-weight: bold; text-align: right;">${formattedIGST}</td>
-            </tr>
-
-            <!-- Total -->
-            <tr style="border-bottom: 1.5px solid #000; font-weight: bold;">
-              <td style="border-right: 1px solid #000;"></td>
-              <td style="padding: 3px 6px; border-right: 1px solid #000;">Total Amount</td>
-              <td colspan="3" style="border-right: 1px solid #000;"></td>
-              <td style="padding: 3px 6px; border-right: 1px solid #000; text-align: center;">Total</td>
-              <td style="padding: 3px 6px; text-align: right;">${formattedTotal}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Amount charged in words -->
-        <div style="border-bottom: 1.5px solid #000; padding: 6px 12px; font-size: 13px; font-weight: bold; text-align: center;">
-          Amount charged in words : ${data.amountInWords}
-        </div>
-
-        <!-- Bank Details & Signatory -->
-        <div style="display: flex; border-bottom: 1.5px solid #000;">
-          <div style="flex: 0 0 52%; padding: 6px 8px; font-size: 11px; border-right: 1.5px solid #000; box-sizing: border-box; min-height: 48px;">
-            <div>Bank Name  : HDFC</div>
-            <div>Bank Account No.  50200004017434 RTGS/IFS Code :HDFC0000331</div>
-          </div>
-          <div style="flex: 1; padding: 6px 10px; font-size: 11px;">
-            <div style="font-weight: bold;">For Rudra Enterprises</div>
-            <div style="height: 28px;"></div>
-            <div>Authorised Signatory</div>
-          </div>
-        </div>
-
-        <!-- Declaration -->
-        <div style="padding: 6px 8px; font-size: 11px; line-height: 1.35;">
-          <div style="font-weight: bold;">Declaration</div>
-          <div>We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct</div>
-        </div>
-
-      </div>
+        </tbody>
+      </table>
 
       <!-- Footer Outside Border -->
-      <div style="padding: 4px 0 2px 0; font-size: 11px; font-weight: bold; text-align: center;">
+      <div style="padding: 4px 0 2px 0; font-size: 8.5pt; font-weight: bold; text-align: center;">
         This is a computer generated invoice
       </div>
     </div>

@@ -1,6 +1,6 @@
 /**
  * Rudra Enterprises Invoice Generator — Core Application Logic
- * 100% Client-Side Generation (Zero Server Required, Ready for Vercel)
+ * 100% Client-Side Generation with Authentic Excel Page Margins
  */
 
 /* ===== Buyer Configuration ===== */
@@ -143,8 +143,8 @@ function handleFormSubmit(e) {
   const taxableValue = amount;
   const igst = taxableValue * 0.18;
   const total = taxableValue + igst;
-  const words = numberToWordsIndian(total);
-  const amountInWords = `${words} Only`;
+  const words = numberToWordsIndian(total); // already contains '... Only'
+  const amountInWords = words;
 
   // Store computed data
   currentInvoiceNo = invoiceNo;
@@ -174,7 +174,7 @@ function handleFormSubmit(e) {
   showScreen('preview');
 }
 
-/* ===== 100% Client-Side Invoice Generation ===== */
+/* ===== 100% Client-Side Invoice Generation with Proper Page Margins ===== */
 async function generateInvoiceDirect() {
   showLoading(true, 'Rendering high-resolution invoice...');
 
@@ -197,7 +197,7 @@ async function generateInvoiceDirect() {
 
     // 2. Render to high-DPI canvas via html2canvas
     const canvas = await html2canvas(invoiceElem, {
-      scale: 2.2, // Crisp print resolution
+      scale: 2.5, // Crisp print resolution
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff'
@@ -205,7 +205,7 @@ async function generateInvoiceDirect() {
 
     const previewDataUrl = canvas.toDataURL('image/png');
 
-    // 3. Generate A4 PDF via jsPDF
+    // 3. Generate A4 PDF via jsPDF with authentic page margins
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -214,14 +214,14 @@ async function generateInvoiceDirect() {
       compress: true
     });
 
-    const a4Width = 210;
-    const a4Height = 297;
-    const canvasRatio = canvas.height / canvas.width;
-    const renderHeight = a4Width * canvasRatio;
+    // A4 sheet: 210mm wide x 297mm high
+    // Authentic Excel margins: 16mm left/right, 18mm top
+    const marginX = 16; // mm
+    const marginY = 18; // mm
+    const printWidth = 210 - (marginX * 2); // 178mm printable width
+    const printHeight = (canvas.height * printWidth) / canvas.width;
 
-    // Render centered or scaled to fit A4 page perfectly
-    const finalHeight = Math.min(renderHeight, a4Height);
-    pdf.addImage(previewDataUrl, 'PNG', 0, 0, a4Width, finalHeight);
+    pdf.addImage(previewDataUrl, 'PNG', marginX, marginY, printWidth, printHeight);
 
     currentPDFBlob = pdf.output('blob');
     if (currentPDFUrl) URL.revokeObjectURL(currentPDFUrl);
@@ -241,7 +241,7 @@ async function generateInvoiceDirect() {
           if (ws) {
             ws['D5'] = { t: 's', v: String(data.invoiceNo) };
             ws['D7'] = { t: 's', v: String(data.invoiceDate) };
-            ws['B18'] = { t: 's', v: 'Ceramic Tile' };
+            ws['B18'] = { t: 's', v: 'Cermaic Tile' };
             ws['D18'] = { t: 'n', v: data.quantity };
             ws['G18'] = { t: 'n', v: data.amount };
             ws['G19'] = { t: 'n', v: data.taxableValue };
@@ -261,7 +261,7 @@ async function generateInvoiceDirect() {
             } else {
               ws['D3'] = { t: 's', v: `${data.invoiceNo}\n${data.invoiceDate}` };
             }
-            ws['B10'] = { t: 's', v: 'Ceramic Tile' };
+            ws['B10'] = { t: 's', v: 'Cermaic Tile' };
             ws['D10'] = { t: 'n', v: data.quantity };
             ws['G10'] = { t: 'n', v: data.amount };
             ws['G11'] = { t: 'n', v: data.taxableValue };
